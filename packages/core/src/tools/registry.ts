@@ -55,7 +55,7 @@ export function registerTools(
         params._caps = caps;
         const result = await sendCommand(command, params, timeout);
         const format = (tool.methodFormatters?.[params.method]) ?? defaultFormat;
-        return format(result);
+        return format(result, params);
       } catch (e) {
         if (e instanceof ZodError) {
           const hints = e.issues.map(i => {

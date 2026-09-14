@@ -205,9 +205,13 @@ methods:
         coerce: true
         optional: true
         description: "Export scale (default: 1, only for PNG/JPG)"
+      path:
+        type: string
+        optional: true
+        description: "Write the export to this file path instead of returning it as image content. Directories are created as needed. Use this whenever the export is an artifact rather than something to look at \u2014 returning a full-size PNG into the agent's context is wasteful, and exporting many is impossible without it."
     response:
       type: object
-      description: Binary image data returned as MCP image content (SVG_STRING returns text)
+      description: Binary image data returned as MCP image content, or a text confirmation when path is set (SVG_STRING returns text)
       properties:
         imageData: { type: string }
         mimeType: { type: string }

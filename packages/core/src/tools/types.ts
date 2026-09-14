@@ -35,7 +35,7 @@ export interface ToolDef {
   /** Custom response formatter. Default: mcpJson */
   formatResponse?: (result: unknown) => any;
   /** Per-method response formatters. Overrides formatResponse for specific methods. */
-  methodFormatters?: Record<string, (result: unknown) => any>;
+  methodFormatters?: Record<string, (result: unknown, params?: any) => any>;
 }
 
 /** Standard batch result from Figma handlers */

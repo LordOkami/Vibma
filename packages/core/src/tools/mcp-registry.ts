@@ -10,6 +10,8 @@ import { resolveGuideline } from "./generated/guidelines";
 
 import { registerPrompts } from "./prompts";
 import { fetchIconSvg, searchIcons, listCollections } from "./iconify";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, resolve as resolvePath } from "node:path";
 import { searchPhotos, getPhoto, fetchImageAsBase64, resolvePexelRef, looksLikeSvg, fetchSvgContent } from "./pexels";
 import {
   parseFileKey,
@@ -32,8 +34,41 @@ const endpointTools = generatedTools.filter(t => t.name !== "connection" && t.na
 const framesTool = endpointTools.find(t => t.name === "frames");
 if (framesTool) {
   framesTool.methodFormatters = {
-    export: (result: unknown) => {
+    /**
+     * With `path`, write the export to disk and return a one-line confirmation.
+     * Without it, behave exactly as before and return the image as MCP content.
+     *
+     * The default is right for looking at one frame and wrong for everything
+     * else: a full-size PNG costs the agent thousands of tokens to receive and
+     * cannot be saved afterwards, so exporting a set — a locale's App Store
+     * screenshots, a page of artboards — was impossible through the MCP at all.
+     * `path` is what turns export from an inspection tool into a build step.
+     */
+    export: (result: unknown, params?: any) => {
       const r = result as any;
+      const target: string | undefined = params?.path;
+
+      if (target) {
+        const abs = resolvePath(target);
+        try {
+          mkdirSync(dirname(abs), { recursive: true });
+          // SVG_STRING arrives as text; everything else as base64.
+          const bytes = r.isString
+            ? Buffer.from(r.imageData, "utf8")
+            : Buffer.from(r.imageData, "base64");
+          writeFileSync(abs, bytes);
+          return {
+            content: [{ type: "text" as const, text: `Wrote ${bytes.length} bytes to ${abs}` }],
+          };
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          return {
+            content: [{ type: "text" as const, text: `frames.export: could not write ${abs} — ${msg}` }],
+            isError: true,
+          };
+        }
+      }
+
       // SVG_STRING returns raw text, not binary
       if (r.isString) {
         return { content: [{ type: "text" as const, text: r.imageData }] };
