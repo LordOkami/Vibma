@@ -55,6 +55,31 @@ Detalles de la implementación que no son obvios:
 - **Un fallo de escritura devuelve `isError`**, no una excepción: el agente tiene
   que poder distinguir "no se pudo escribir" de "el export falló".
 
+## Instalarlo en otra máquina (Mac o Windows)
+
+Repo del fork: **https://github.com/LordOkami/vibma** (upstream: `ufira-ai/vibma`).
+
+```bash
+git clone https://github.com/LordOkami/vibma.git vibma-fork
+cd vibma-fork
+npm install
+npm run build          # genera packages/core/dist/mcp.js
+```
+
+Apuntar el MCP de Claude Code al build local en vez de a `npx @ufira/vibma@latest`
+(quitar antes la entrada vieja con `claude mcp remove Vibma -s user` si existe):
+
+```bash
+# macOS
+claude mcp add Vibma -s user -- node /ruta/a/vibma-fork/packages/core/dist/mcp.js --edit
+# Windows (PowerShell) — ruta con barras normales
+claude mcp add Vibma -s user -- node C:/ruta/a/vibma-fork/packages/core/dist/mcp.js --edit
+```
+
+Reiniciar la sesión de Claude Code y comprobar con `help` de `frames` que `export`
+lista el parámetro `path`. El plugin de Figma **no** cambia: sigue valiendo el instalado.
+El relay tampoco: `npx @ufira/vibma-tunnel` (puerto 3055, canal `vibma`).
+
 ## Por qué no se parcheó el paquete de npm
 
 La configuración MCP resolvía `npx -y @ufira/vibma@latest`, que vive en
