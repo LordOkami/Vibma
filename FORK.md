@@ -60,7 +60,7 @@ Detalles de la implementación que no son obvios:
 Repo del fork: **https://github.com/LordOkami/vibma** (upstream: `ufira-ai/vibma`).
 
 ```bash
-git clone https://github.com/LordOkami/vibma.git vibma-fork
+git clone https://github.com/LordOkami/Vibma.git vibma-fork
 cd vibma-fork
 npm install
 npm run build          # genera packages/core/dist/mcp.js
